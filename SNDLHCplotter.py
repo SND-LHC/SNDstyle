@@ -4,6 +4,8 @@ from argparse import ArgumentParser
 from datetime import date
 
 import ROOT
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+from SNDstyle import init_style, writeSND
 
 today = date.today().strftime('%d%m%y')
 """
@@ -38,155 +40,6 @@ today = date.today().strftime('%d%m%y')
     Still WIP
 """
 
-
-def init_style():
-
-    #for the canvas:
-    ROOT.gStyle.SetCanvasBorderMode(0)
-    ROOT.gStyle.SetCanvasColor(ROOT.kWhite)
-    ROOT.gStyle.SetCanvasDefH(600) #Height of canvas
-    ROOT.gStyle.SetCanvasDefW(600) #Width of canvas
-    ROOT.gStyle.SetCanvasDefX(10)   #Position on screen
-    ROOT.gStyle.SetCanvasDefY(10)
-
-
-    ROOT.gStyle.SetPadBorderMode(0)
-    ROOT.gStyle.SetPadColor(ROOT.kWhite)
-    ROOT.gStyle.SetPadGridX(False)
-    ROOT.gStyle.SetPadGridY(False)
-    ROOT.gStyle.SetGridColor(0)
-    ROOT.gStyle.SetGridStyle(3)
-    ROOT.gStyle.SetGridWidth(1)
-
-    #For the frame:
-    ROOT.gStyle.SetFrameBorderMode(0)
-    ROOT.gStyle.SetFrameBorderSize(1)
-    ROOT.gStyle.SetFrameFillColor(0)
-    ROOT.gStyle.SetFrameFillStyle(0)
-    ROOT.gStyle.SetFrameLineColor(1)
-    ROOT.gStyle.SetFrameLineStyle(1)
-    ROOT.gStyle.SetFrameLineWidth(3)
-
-    #For the histo:
-    ROOT.gStyle.SetHistLineColor(ROOT.kBlue)
-    ROOT.gStyle.SetHistLineStyle(0)
-    ROOT.gStyle.SetHistLineWidth(2)
-
-
-    ROOT.gStyle.SetEndErrorSize(2)
-
-
-    ROOT.gStyle.SetMarkerStyle(20)
-
-    #For the fit/function:
-    ROOT.gStyle.SetOptFit(1)
-    ROOT.gStyle.SetFitFormat("5.4g")
-    ROOT.gStyle.SetFuncColor(2)
-    ROOT.gStyle.SetFuncStyle(1)
-    ROOT.gStyle.SetFuncWidth(1)
-
-    #For the date:
-    ROOT.gStyle.SetOptDate(0)
-
-
-    # For the statistics box:
-    ROOT.gStyle.SetOptFile(0)
-    ROOT.gStyle.SetOptStat(0) # To display the mean and RMS:   SetOptStat("mr")
-    ROOT.gStyle.SetStatColor(ROOT.kWhite)
-    ROOT.gStyle.SetStatFont(42)
-    ROOT.gStyle.SetStatFontSize(0.025)
-    ROOT.gStyle.SetStatTextColor(1)
-    ROOT.gStyle.SetStatFormat("6.4g")
-    ROOT.gStyle.SetStatBorderSize(1)
-    ROOT.gStyle.SetStatH(0.1)
-    ROOT.gStyle.SetStatW(0.15)
-
-    # Margins:
-    #ROOT.gStyle.SetPadTopMargin(0.05)
-    #ROOT.gStyle.SetPadBottomMargin(0.15)
-    #ROOT.gStyle.SetPadLeftMargin(0.15)
-    #ROOT.gStyle.SetPadRightMargin(0.05)
-
-    # For the Global title:
-
-    ROOT.gStyle.SetOptTitle(0)
-    ROOT.gStyle.SetTitleFont(42)
-    ROOT.gStyle.SetTitleColor(1)
-    ROOT.gStyle.SetTitleTextColor(1)
-    ROOT.gStyle.SetTitleFillColor(10)
-    ROOT.gStyle.SetTitleFontSize(0.05)
-
-
-    # For the axis titles:
-    
-    ROOT.gStyle.SetTitleColor(1, "XYZ")
-    ROOT.gStyle.SetTitleFont(42, "XYZ")
-    ROOT.gStyle.SetTitleSize(0.04, "XYZ")
-    ROOT.gStyle.SetTitleXOffset(0.8)
-    ROOT.gStyle.SetTitleYOffset(1.2)
-    
-
-    # For the axis labels:
-    
-    ROOT.gStyle.SetLabelColor(1, "XYZ")
-    ROOT.gStyle.SetLabelFont(42, "XYZ")
-    ROOT.gStyle.SetLabelOffset(0.007, "XYZ")
-    ROOT.gStyle.SetLabelSize(0.04, "XYZ")
-    
-
-    # For the axis:
-
-    ROOT.gStyle.SetAxisColor(1, "XYZ")
-    ROOT.gStyle.SetStripDecimals(True)
-    ROOT.gStyle.SetTickLength(0.03, "XYZ")
-    ROOT.gStyle.SetNdivisions(510, "XYZ")
-    ROOT.gStyle.SetPadTickX(1)  # To get tick marks on the opposite side of the frame
-    ROOT.gStyle.SetPadTickY(1)
-
-def writeSND(pad,
-    text_factor=0.9,
-    text_offset=0.01,
-    extratext=None,
-    text_in=True,
-    rfrac=0.,
-    maintext='SND@LHC',
-    drawLogo=True):
-
-    pad.Update()
-
-    l = pad.GetLeftMargin()
-    t = pad.GetTopMargin()
-    r = pad.GetRightMargin()
-    b = pad.GetBottomMargin()
-
-    SNDTextSize = t*text_factor
-    SNDTextVerticalOffset = text_offset
-
-    pad.cd()
-
-    latex = ROOT.TLatex()
-    latex.SetNDC()
-    latex.SetTextAngle(0)
-    latex.SetTextColor(ROOT.kBlack)
-
-    latex.SetTextFont(61)
-    latex.SetTextAlign(11)
-    latex.SetTextSize(SNDTextSize)
-    latex.SetText(0,0,maintext)
-
-    sndX = SNDTextSize*2*(1-rfrac)
-
-    if not text_in: latex.DrawLatex(l, 1-t+SNDTextVerticalOffset, maintext)
-    else: latex.DrawLatex(l+0.03, 1-t-SNDTextVerticalOffset-1.2*SNDTextSize, maintext)
-
-    extraTextSize = SNDTextSize*0.8
-    latex.SetTextFont(52)
-    latex.SetTextSize(extraTextSize)
-    latex.SetTextAlign(11)
-    if not text_in: latex.DrawLatex(l+0.03 + 2.2*sndX, 1-t+SNDTextVerticalOffset, extratext)
-    else: latex.DrawLatex(l+0.03, 1-t-SNDTextVerticalOffset-2*SNDTextSize, extratext)
-
-    pad.Update()
 
 def load_hists(histfile, query=None):
     f = ROOT.TFile.Open(histfile)
@@ -260,9 +113,9 @@ def drawSingleHisto(hist, canvas=None, xaxtitle=None, yaxtitle=None,
     if color is None: color = ROOT.kAzure-4
 
     if xaxlabelfont is None: xaxlabelfont = 4 
-    if xaxlabelsize is None: xaxlabelsize = 22
-    yaxlabelfont = 4; yaxlabelsize = 22
-    axtitlefont = 6; axtitlesize = 26
+    if xaxlabelsize is None: xaxlabelsize = 15
+    yaxlabelfont = 4; yaxlabelsize = 15
+    axtitlefont = 6; axtitlesize = 18
     legendfont = 5
     if leftmargin is None: leftmargin = 0.15
     if rightmargin is None: rightmargin = 0.05
@@ -273,7 +126,7 @@ def drawSingleHisto(hist, canvas=None, xaxtitle=None, yaxtitle=None,
     canvas.SetRightMargin(rightmargin)
     canvas.SetTopMargin(topmargin)
 
-    pentryheight = 0.2
+    pentryheight = 0.12
     plegendbox = ([leftmargin+0.30,1-topmargin-pentryheight-0.01, 1-rightmargin-0.03,1-topmargin-0.03])
     hist.SetLineColor(color)
     hist.SetLineWidth(2)
@@ -314,10 +167,10 @@ def drawSingleHisto(hist, canvas=None, xaxtitle=None, yaxtitle=None,
     if xaxrange:
         xax.SetRangeUser(float(xaxrange[0]), float(xaxrange[1]))
     if not logy:
-        hist.SetMaximum(hist.GetMaximum()*1.2)
+        hist.SetMaximum(hist.GetMaximum()*1.35)
         hist.SetMinimum(0.)
     else:
-        hist.SetMaximum(hist.GetMaximum()*10)
+        hist.SetMaximum(hist.GetMaximum()*100)
         #hist.SetMinimum(hist.GetMaximum()/1e7)
         canvas.SetLogy()
     yax = hist.GetYaxis()
@@ -329,7 +182,7 @@ def drawSingleHisto(hist, canvas=None, xaxtitle=None, yaxtitle=None,
         yax.SetTitle(yaxtitle)
     yax.SetTitleFont(10*axtitlefont+3)
     yax.SetTitleSize(axtitlesize)
-    yax.SetTitleOffset(1.2)
+    yax.SetTitleOffset(1.5)
     yax.CenterTitle(True)
     if yaxrange:yax.SetRangeUser(float(yaxrange[0]), float(yaxrange[1]))
     
